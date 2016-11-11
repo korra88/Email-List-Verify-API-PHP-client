@@ -44,7 +44,7 @@ class APIClient {
      * Ex: set it at true to treat emails as valid.
      * @param mixed $value
      */
-    public function setUnknownVerificationReturnValue($value) {
+    public function setUnknownReturnValue($value) {
         $this->unkown_return = $value;
     }
 

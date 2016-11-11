@@ -1,9 +1,14 @@
 {
-    "name": "korra88/EmailListVerify-API-PHP-client",
-    "description": "",
-    "require": {
-        "php": "^5.6 || ^7.0"
-    },
+    "name": "korra88/email-list-verify-api-php-client",
+    "type": "library",
+    "license": "MIT License",
+    "authors": [
+        {
+            "name": "Emanuele Corradini",
+            "email": "korra88@gmail.com"
+        }
+    ],
+    "require": {},
     "autoload": {
         "psr-4": {
             "EmailListVerify\\": "src/"
