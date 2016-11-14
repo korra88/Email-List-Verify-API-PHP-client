@@ -150,7 +150,7 @@ class APIClient {
         );
 
         $httpcode = null;
-        $response = $this->curl_get($this->base_url . 'verifyEmail', $params, $httpcode);
+        $response = $this->curl_get($this->base_url . 'getApiFileInfo', $params, $httpcode);
 
         if ($response == false) {
             throw new Exception(get_class() . ": request failed with HTTP code: {$httpcode}.");
