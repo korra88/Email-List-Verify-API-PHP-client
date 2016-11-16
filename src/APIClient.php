@@ -2,6 +2,8 @@
 
 namespace EmailListVerify;
 
+use Exception;
+
 class APIClient {
 
     /**
@@ -81,10 +83,11 @@ class APIClient {
      * "EmailListVerify\APIClient->unknown_return" so you can configure them as
      * valid/invalid/anything else.
      * @param string $email
+     * @param string $status    Pass $status to read response code.
      * @return boolean
-     * #@throws \Exception
+     * #@throws Exception
      */
-    public function verifyEmail($email) {
+    public function verifyEmail($email, & $status) {
         $params = array(
             'email' => $email,
             'secret' => $this->KEY
@@ -93,21 +96,22 @@ class APIClient {
         $httpcode = null;
         $response = $this->curl_get($this->base_url . 'verifyEmail', $params, $httpcode);
 
-        if ($response == false) {
-            throw new \Exception(get_class() . ": request failed with HTTP code: {$httpcode}.");
+        if ($response == false || $httpcode != 200) {
+            throw new Exception(get_class() . ": request failed with HTTP code: {$httpcode}.");
         } else {
             $this->last_status = $response;
+            $status = $response;
             return $this->parseStatus($response);
         }
     }
 
     /**
-     * Parses Status codes and return true/false or an \Exception.
+     * Parses Status codes and return true/false or an Exception.
      * Read both codes return by OneByONe verification than file verification.
      * @url http://www.emaillistverify.com/docs/result-guide
      * @param type $status
      * @return boolean
-     * @throws \Exception
+     * @throws Exception
      */
     public function parseStatus($status) {
         switch ($status) {
@@ -167,16 +171,18 @@ class APIClient {
                 return $this->spamtrap_return;
             // ERRORS
             case 'antispam_system':
-                throw new \Exception(get_class() . ': some anti-spam technology is blocking the verification progress.');
+                throw new Exception(get_class() . ': some anti-spam technology is blocking the verification progress.');
             case 'relay_error':
-                throw new \Exception(get_class() . ': delivery fail because a relaying problem took place.');
+                throw new Exception(get_class() . ': delivery fail because a relaying problem took place.');
             case 'syntax_error':
             case 'incorrect':
-                throw new \Exception(get_class() . ': no email provided in request. Email syntax error (example: myaddress[at]gmail.com, must be myaddress@gmail.com).');
+                throw new Exception(get_class() . ': no email provided in request. Email syntax error (example: myaddress[at]gmail.com, must be myaddress@gmail.com).');
             case 'key_not_valid':
-                throw new \Exception(get_class() . ': no api key provided in request or invalid.');
+                throw new Exception(get_class() . ': no api key provided in request or invalid.');
             case 'missing_paramteres':
-                throw new \Exception(get_class() . ': there are no validations remaining to complete this attempt.');
+                throw new Exception(get_class() . ': there are no validations remaining to complete this attempt.');
+            default:
+                throw new Exception(get_class() . ': status "' . $status . '" is not supperted.');
         }
     }
 
@@ -186,12 +192,12 @@ class APIClient {
      * @param string $file_name
      * @param string $file_path
      * @return type
-     * @throws \Exception
+     * @throws Exception
      */
     public function verifyApiFile($file_name, $file_path) {
 
         if (!file_exists($file_path)) {
-            throw new \Exception(get_class() . ": can't upload {$file_name}, file doesn't exists:\n{$file_path}");
+            throw new Exception(get_class() . ": can't upload {$file_name}, file doesn't exists:\n{$file_path}");
         } else {
             $post_params = array(
                 'file_contents' => "@$file_path"
@@ -205,7 +211,7 @@ class APIClient {
             $httpcode = null;
             $response = $this->curl_post($this->base_url . 'verifyApiFile?' . http_build_query($query_params), $post_params, $httpcode);
             if ($response == false) {
-                throw new \Exception(get_class() . ": request failed with HTTP code: {$httpcode}.");
+                throw new Exception(get_class() . ": request failed with HTTP code: {$httpcode}.");
             } else {
                 // Save
                 $this->last_file_id = $response;
@@ -224,7 +230,7 @@ class APIClient {
      * Check file status.
      * @param string $id
      * @return FileInfo
-     * @throws \Exception
+     * @throws Exception
      */
     public function getApiFileInfo($id) {
         $params = array(
@@ -236,7 +242,7 @@ class APIClient {
         $response = $this->curl_get($this->base_url . 'getApiFileInfo', $params, $httpcode);
 
         if ($response == false) {
-            throw new \Exception(get_class() . ": request failed with HTTP code: {$httpcode}.");
+            throw new Exception(get_class() . ": request failed with HTTP code: {$httpcode}.");
         } else {
 
             // Valid request.
