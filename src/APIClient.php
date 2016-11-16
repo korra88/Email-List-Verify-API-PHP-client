@@ -87,7 +87,7 @@ class APIClient {
      * @return boolean
      * #@throws Exception
      */
-    public function verifyEmail($email, & $status) {
+    public function verifyEmail($email, & $status = false) {
         $params = array(
             'email' => $email,
             'secret' => $this->KEY
