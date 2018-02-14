@@ -1,7 +1,7 @@
 {
     "name": "korra88/email-list-verify-api-php-client",
     "type": "library",
-    "license": "MIT License",
+    "license": "MIT",
     "authors": [
         {
             "name": "Emanuele Corradini",
